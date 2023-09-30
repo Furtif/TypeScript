@@ -12,6 +12,7 @@ import {
     DefaultClause,
     findChildOfKind,
     getLeadingCommentRanges,
+    ImportAttributes,
     isAnyImportSyntax,
     isArrayLiteralExpression,
     isBinaryExpression,
@@ -46,15 +47,12 @@ import {
     OutliningSpanKind,
     ParenthesizedExpression,
     positionsAreOnSameLine,
-    Push,
     SignatureDeclaration,
     SourceFile,
     startsWith,
     SyntaxKind,
     TemplateExpression,
     TextSpan,
-    trimString,
-    trimStringStart,
     TryStatement,
 } from "./_namespaces/ts";
 
@@ -66,7 +64,7 @@ export function collectElements(sourceFile: SourceFile, cancellationToken: Cance
     return res.sort((span1, span2) => span1.textSpan.start - span2.textSpan.start);
 }
 
-function addNodeOutliningSpans(sourceFile: SourceFile, cancellationToken: CancellationToken, out: Push<OutliningSpan>): void {
+function addNodeOutliningSpans(sourceFile: SourceFile, cancellationToken: CancellationToken, out: OutliningSpan[]): void {
     let depthRemaining = 40;
     let current = 0;
     // Includes the EOF Token so that comments which aren't attached to statements are included
@@ -135,7 +133,7 @@ function addNodeOutliningSpans(sourceFile: SourceFile, cancellationToken: Cancel
     }
 }
 
-function addRegionOutliningSpans(sourceFile: SourceFile, out: Push<OutliningSpan>): void {
+function addRegionOutliningSpans(sourceFile: SourceFile, out: OutliningSpan[]): void {
     const regions: OutliningSpan[] = [];
     const lineStarts = sourceFile.getLineStarts();
     for (const currentLineStart of lineStarts) {
@@ -165,15 +163,15 @@ const regionDelimiterRegExp = /^#(end)?region(?:\s+(.*))?(?:\r)?$/;
 function isRegionDelimiter(lineText: string) {
     // We trim the leading whitespace and // without the regex since the
     // multiple potential whitespace matches can make for some gnarly backtracking behavior
-    lineText = trimStringStart(lineText);
-    if (!startsWith(lineText, "\/\/")) {
+    lineText = lineText.trimStart();
+    if (!startsWith(lineText, "//")) {
         return null; // eslint-disable-line no-null/no-null
     }
-    lineText = trimString(lineText.slice(2));
+    lineText = lineText.slice(2).trim();
     return regionDelimiterRegExp.exec(lineText);
 }
 
-function addOutliningForLeadingCommentsForPos(pos: number, sourceFile: SourceFile, cancellationToken: CancellationToken, out: Push<OutliningSpan>): void {
+function addOutliningForLeadingCommentsForPos(pos: number, sourceFile: SourceFile, cancellationToken: CancellationToken, out: OutliningSpan[]): void {
     const comments = getLeadingCommentRanges(sourceFile.text, pos);
     if (!comments) return;
 
@@ -220,7 +218,7 @@ function addOutliningForLeadingCommentsForPos(pos: number, sourceFile: SourceFil
     }
 }
 
-function addOutliningForLeadingCommentsForNode(n: Node, sourceFile: SourceFile, cancellationToken: CancellationToken, out: Push<OutliningSpan>): void {
+function addOutliningForLeadingCommentsForNode(n: Node, sourceFile: SourceFile, cancellationToken: CancellationToken, out: OutliningSpan[]): void {
     if (isJsxText(n)) return;
     addOutliningForLeadingCommentsForPos(n.pos, sourceFile, cancellationToken, out);
 }
@@ -303,11 +301,12 @@ function getOutliningSpanForNode(n: Node, sourceFile: SourceFile): OutliningSpan
             return spanForParenthesizedExpression(n as ParenthesizedExpression);
         case SyntaxKind.NamedImports:
         case SyntaxKind.NamedExports:
+        case SyntaxKind.ImportAttributes:
         case SyntaxKind.AssertClause:
-            return spanForNamedImportsOrExportsOrAssertClause(n as NamedImports | NamedExports | AssertClause);
+            return spanForImportExportElements(n as NamedImports | NamedExports | AssertClause | ImportAttributes);
     }
 
-    function spanForNamedImportsOrExportsOrAssertClause(node: NamedImports | NamedExports | AssertClause) {
+    function spanForImportExportElements(node: NamedImports | NamedExports | AssertClause | ImportAttributes) {
         if (!node.elements.length) {
             return undefined;
         }
