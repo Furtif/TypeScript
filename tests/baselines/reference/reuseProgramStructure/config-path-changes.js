@@ -3,15 +3,11 @@ File: c.ts
 
 
 var z = 1;
-resolvedModules: undefined
-resolvedTypeReferenceDirectiveNames: undefined
 
 File: b.ts
 /// <reference path='c.ts'/>
 
 var y = 2
-resolvedModules: undefined
-resolvedTypeReferenceDirectiveNames: undefined
 
 File: a.ts
 
@@ -21,12 +17,15 @@ File: a.ts
 
 
 var x = 1
-resolvedModules: undefined
-resolvedTypeReferenceDirectiveNames: 
+resolvedTypeReferenceDirectiveNames:
 typerefs: {
   "failedLookupLocations": [
     "/a/b/node_modules/@types/typerefs/package.json",
     "/a/b/node_modules/@types/typerefs/index.d.ts",
+    "/a/node_modules/@types/typerefs/package.json",
+    "/a/node_modules/@types/typerefs/index.d.ts",
+    "/node_modules/@types/typerefs/package.json",
+    "/node_modules/@types/typerefs/index.d.ts",
     "node_modules/typerefs/package.json",
     "node_modules/typerefs.d.ts",
     "node_modules/typerefs/index.d.ts",
@@ -49,15 +48,11 @@ File: c.ts
 
 
 var z = 1;
-resolvedModules: undefined
-resolvedTypeReferenceDirectiveNames: undefined
 
 File: b.ts
 /// <reference path='c.ts'/>
 
 var y = 2
-resolvedModules: undefined
-resolvedTypeReferenceDirectiveNames: undefined
 
 File: a.ts
 
@@ -67,12 +62,15 @@ File: a.ts
 
 
 var x = 1
-resolvedModules: undefined
-resolvedTypeReferenceDirectiveNames: 
+resolvedTypeReferenceDirectiveNames:
 typerefs: {
   "failedLookupLocations": [
     "/a/c/node_modules/@types/typerefs/package.json",
     "/a/c/node_modules/@types/typerefs/index.d.ts",
+    "/a/node_modules/@types/typerefs/package.json",
+    "/a/node_modules/@types/typerefs/index.d.ts",
+    "/node_modules/@types/typerefs/package.json",
+    "/node_modules/@types/typerefs/index.d.ts",
     "node_modules/typerefs/package.json",
     "node_modules/typerefs.d.ts",
     "node_modules/typerefs/index.d.ts",
